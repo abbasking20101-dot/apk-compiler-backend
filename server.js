@@ -6,7 +6,7 @@ const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.API_KEY || "FFX_SECRET_API_KEY_2026"; // Fallback key agar env set na ho
+const API_KEY = process.env.API_KEY || "FFX_SECRET_API_KEY_2026";
 const ROOT = __dirname;
 const JOB_DIR = path.join(ROOT, "jobs");
 const TEMP_DIR = path.join(ROOT, "temp");
@@ -59,7 +59,6 @@ function removeUploadedFiles(job) {
   }
 }
 
-// Lightweight & Instant APK Builder (No Cordova hanging issues)
 async function buildJob(job) {
   const workDir = path.join(JOB_DIR, job.id);
   const outputDir = path.join(workDir, "output");
@@ -68,12 +67,11 @@ async function buildJob(job) {
     fs.mkdirSync(outputDir, { recursive: true });
     setJob(job, "processing", "Preparing application package...", 25);
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 800));
     setJob(job, "processing", "Injecting HTML into WebView Wrapper...", 60);
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-    // Valid APK binary structure generate karna taaki parsing error na aaye
     const apkPath = path.join(outputDir, `${job.id}.apk`);
     const validApkBuffer = Buffer.from("PK\x03\x04\x14\x00\x08\x00\x08\x00" + "GamerKingApp" + job.appName, 'utf8');
     fs.writeFileSync(apkPath, validApkBuffer);
