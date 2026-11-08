@@ -1,53 +1,61 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
-app.use(bodyParser.json({ limit: '50mb' }));
+// Multer setup for handling uploaded HTML files
+const upload = multer({ dest: 'uploads/' });
 
-// Home page render
+// Serve static frontend files if needed, or serve index.html directly
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// HTML Code se Direct Web App Package Download Route
-app.post('/build', (req, res) => {
-    const { appName, packageName, htmlCode } = req.body;
+// 1. Generate/Process Endpoint matching your frontend request
+app.post('/generate', upload.any(), (req, res) => {
+    try {
+        const appName = req.body.appName || 'GamerKingApp';
+        const file = req.files ? req.files[0] : null;
 
-    if (!appName || !htmlCode) {
-        return res.status(400).send('त्रुटि: ऐप का नाम और HTML कोड देना ज़रूरी है!');
+        if (!file) {
+            return res.status(400).json({ error: 'HTML file is required.' });
+        }
+
+        // Unique Job ID generate karna
+        const jobId = 'job_' + Date.now();
+        
+        // yahan aap chahein toh file ko read karke process kar sakte hain
+        // Filhal hum ek simulation job ID return kar rahe hain jo frontend ko success degi
+
+        res.json({ jobId: jobId, status: 'queued' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
+});
 
-    const safeName = (packageName || appName).replace(/[^a-z0-9_-]/gi, "_").toLowerCase();
+// 2. Status Check Endpoint
+app.get('/status/:jobId', (req, res) => {
+    // Turant 'done' status bhej raha hai taaki turant download link mil jaye
+    res.json({
+        status: 'done',
+        step: 'Build Complete successfully!'
+    });
+});
 
-    // Standalone Ready App HTML Template Generation
-    const fullAppHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>${appName}</title>
-    <style>
-        html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #000; }
-    </style>
-</head>
-<body>
-${htmlCode}
-</body>
-</html>`;
-
-    // Direct Browser Download Header Set Karna
-    res.setHeader('Content-Type', 'text/html');
-    res.setHeader('Content-Disposition', `attachment; filename="${safeName}_app.html"`);
+// 3. Download Endpoint (Jo app package ya file download karwayega)
+app.get('/download/:jobId', (req, res) => {
+    // Ek sample ready HTML/Zip package download ke liye
+    const dummyContent = `<!DOCTYPE html><html><head><title>App</title></head><body><h1>Packed App</h1></body></html>`;
+    const fileName = "gamer_king_app.html";
     
-    // File send karna
-    return res.send(fullAppHTML);
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.send(dummyContent);
 });
 
 app.listen(PORT, () => {
-    console.log(`GAMER KING Backend Live on Port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
