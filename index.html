@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML to APK Builder</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: #1e293b; padding: 20px; border-radius: 10px; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; background: #334155; border: none; color: #fff; border-radius: 5px; }
+        button { background: #6366f1; color: white; padding: 12px; width: 100%; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #4f46e5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>अपना HTML ऐप बनाएँ</h2>
+        <form action="/build" method="POST">
+            <label>ऐप का नाम (App Name):</label>
+            <input type="text" name="appName" placeholder="जैसे: My Game" required>
+
+            <label>पैकेज नेम (Package Name):</label>
+            <input type="text" name="packageName" placeholder="जैसे: com.example.app" required>
+
+            <label>अपना HTML कोड यहाँ पेस्ट करें:</label>
+            <textarea name="htmlCode" rows="10" placeholder="<h1>Hello World</h1>" required></textarea>
+
+            <button type="submit">Build App (APK बनाएँ)</button>
+        </form>
+    </div>
+</body>
+</html>
